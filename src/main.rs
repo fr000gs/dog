@@ -106,19 +106,20 @@ fn cat(filename: String, args_1: Vec<String>) -> bool {
     let mut buf_reader = BufReader::new(myfile);
     let mut contents = String::new();
     buf_reader.read_to_string(&mut contents).unwrap_or_else(|_| panic!("Failed to read file: {}", &filename));
-    dbg!(&contents);
     print!("{}", options(contents, args_1));
     std::io::stdout().flush().expect("Failed to flush pwned");
     false
 }
 
 fn help() {
-    println!("Usage: cat [OPTION]... [FILE]...
-             Concatenate FILE(s) to standard output.
+    println!(
+"Usage: dog [OPTION]... [FILE]...
+Concatenate FILE(s) to standard output.
 
 With no FILE, or when FILE is -, read standard input.
 
-(Double EOF is required instead of single EOF)
+(Double EOF is required instead of single EOF when
+last character is not LF)
 
   -A, --show-all           equivalent to -vET
   -b, --number-nonblank    number nonempty output lines, overrides -n // TODO (after -n)
@@ -134,8 +135,8 @@ With no FILE, or when FILE is -, read standard input.
       --version     output version information and exit
 
 Examples:
-  cat f - g  Output f's contents, then standard input, then g's contents.
-  cat        Copy standard input to standard output.");
+  dog f - g  Output f's contents, then standard input, then g's contents.
+  dog        Copy standard input to standard output. // TODO"); 
     std::process::exit(0);
 }
 
@@ -152,6 +153,7 @@ Written by fr000gs (Fat Frog).");
 }
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+
     let argus = parse_args(args.clone());
     let (args_1, only_filename_args) = (argus[0].clone(), argus[1].clone());
 
@@ -163,8 +165,10 @@ fn main() {
         version();
     }
 
+    dbg!(args.len() < 2_usize);
     for filename in &args_1 {
         if filename.as_bytes() == [b'-'] || args.len() < 2_usize {
+            // FIXME
             hyphen(args_1.clone());
         }
         else if filename.as_bytes()[0]!=b'-' && cat(filename.to_string(), args_1.clone()) {
